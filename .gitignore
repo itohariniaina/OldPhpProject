@@ -1,0 +1,42 @@
+# --- Python & Flask ---
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+instance/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# --- Environment Variables & Secrets ---
+.env
+.flaskenv
+
+# --- Application Data (Nouveau projet Python) ---
+# On ignore les images uploadées et les résultats générés
+app/static/uploads/*
+app/static/output/*
+# Exception : on garde le fichier .gitkeep s'il existe pour maintenir la structure des dossiers
+!app/static/uploads/.gitkeep
+!app/static/output/.gitkeep
+
+# --- Docker ---
+.docker/
+docker-compose.override.yml
+
+# --- IDE & OS (Système) ---
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# --- Legacy PHP (Ancien projet) ---
+# Ignore les dossiers de logs et d'uploads de l'ancienne version PHP
+/logs/*
+/uploads/*
+/output/*
+vendor/
+composer.lock

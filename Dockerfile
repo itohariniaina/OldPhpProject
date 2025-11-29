@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app/ ./app/
 
 # Création des dossiers pour uploads/outputs
-RUN mkdir -p /app/static/uploads /app/static/output
+RUN mkdir -p /app/app/static/uploads /app/app/static/output
 
 # Exposition du port
 EXPOSE 5000
