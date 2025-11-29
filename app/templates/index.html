@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quantification des Couleurs (Python Edition)</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Quantification des Couleurs - Python/Flask</h1>
+
+      <form
+        action="{{ url_for('process_image') }}"
+        method="post"
+        enctype="multipart/form-data"
+      >
+        <label for="image">Sélectionner une image :</label>
+        <input type="file" id="image" name="image" accept="image/*" required />
+
+        <label for="nbCouleurs">Nombre de couleurs dans la palette :</label>
+        <input
+          type="number"
+          id="nbCouleurs"
+          name="nbCouleurs"
+          min="2"
+          max="256"
+          value="8"
+          required
+        />
+
+        <button type="submit">Analyser l'image</button>
+      </form>
+
+      <div class="info-box">
+        <h2>Migration Python</h2>
+        <p>Cette application a été portée de PHP vers Python.</p>
+        <ul>
+          <li><strong>Méthode Naïve</strong> : PIL FastOctree</li>
+          <li>
+            <strong>Méthode K-means</strong> : Scikit-Learn MiniBatchKMeans
+            (Vectorisé)
+          </li>
+          <li><strong>Méthode Pro</strong> : PIL MedianCut</li>
+        </ul>
+      </div>
+
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <div class="error-message">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+    </div>
+  </body>
+</html>

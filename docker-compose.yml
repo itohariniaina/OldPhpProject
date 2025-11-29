@@ -1,0 +1,11 @@
+services:
+  web:
+    build: .
+    ports:
+      # Format : "PORT_HOTE : PORT_CONTENEUR"
+      # On change le port gauche (votre machine) en 5001
+      - "5001:5000"
+    volumes:
+      - ./app:/app/app
+    environment:
+      - FLASK_DEBUG=1
