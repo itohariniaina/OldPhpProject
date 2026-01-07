@@ -3,58 +3,110 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quantification des Couleurs (Python Edition)</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
-    />
+    <title>OptimizeSaaS - Demo</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+      }
+      .box {
+        border: 2px dashed #ccc;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      #preview {
+        max-width: 100%;
+        margin-top: 20px;
+        display: none;
+      }
+      .loading {
+        color: #007bff;
+        display: none;
+      }
+      .success {
+        color: #28a745;
+        font-weight: bold;
+      }
+      .error {
+        color: #dc3545;
+      }
+    </style>
   </head>
   <body>
-    <div class="container">
-      <h1>Quantification des Couleurs - Python/Flask</h1>
+    <h1>🎨 OptimizeSaaS (Demo Locale)</h1>
+    <p>Réduisez les couleurs de vos images grâce à l'IA.</p>
 
-      <form
-        action="{{ url_for('process_image') }}"
-        method="post"
-        enctype="multipart/form-data"
-      >
-        <label for="image">Sélectionner une image :</label>
-        <input type="file" id="image" name="image" accept="image/*" required />
-
-        <label for="nbCouleurs">Nombre de couleurs dans la palette :</label>
-        <input
-          type="number"
-          id="nbCouleurs"
-          name="nbCouleurs"
-          min="2"
-          max="256"
-          value="8"
-          required
-        />
-
-        <button type="submit">Analyser l'image</button>
-      </form>
-
-      <div class="info-box">
-        <h2>Migration Python</h2>
-        <p>Cette application a été portée de PHP vers Python.</p>
-        <ul>
-          <li><strong>Méthode Naïve</strong> : PIL FastOctree</li>
-          <li>
-            <strong>Méthode K-means</strong> : Scikit-Learn MiniBatchKMeans
-            (Vectorisé)
-          </li>
-          <li><strong>Méthode Pro</strong> : PIL MedianCut</li>
-        </ul>
-      </div>
-
-      {% with messages = get_flashed_messages() %} {% if messages %}
-      <div class="error-message">
-        {% for message in messages %}
-        <p>{{ message }}</p>
-        {% endfor %}
-      </div>
-      {% endif %} {% endwith %}
+    <div class="box">
+      <input type="file" id="imageInput" accept="image/*" />
+      <br /><br />
+      <label
+        >Couleurs : <input type="number" id="colors" value="8" min="2" max="16"
+      /></label>
+      <br /><br />
+      <button onclick="uploadImage()">Optimiser l'image</button>
     </div>
+
+    <div id="statusArea"></div>
+    <img id="preview" src="" alt="Résultat" />
+
+    <script>
+      async function uploadImage() {
+        const fileInput = document.getElementById("imageInput");
+        const colors = document.getElementById("colors").value;
+        const statusArea = document.getElementById("statusArea");
+        const preview = document.getElementById("preview");
+
+        if (!fileInput.files[0]) return alert("Sélectionnez une image !");
+
+        const formData = new FormData();
+        formData.append("image", fileInput.files[0]);
+        formData.append("colors", colors);
+
+        statusArea.innerHTML =
+          '<span class="loading">Envoi et traitement en cours...</span>';
+        preview.style.display = "none";
+
+        try {
+          // 1. Envoi au serveur
+          const response = await fetch("/api/optimize", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await response.json();
+
+          if (!response.ok) throw new Error(data.error || "Erreur serveur");
+
+          statusArea.innerHTML = `Traitement ID: ${data.task_id} (Quota: ${data.quota_used})...`;
+
+          // 2. Polling (Vérifier le statut toutes les secondes)
+          pollStatus(data.task_id);
+        } catch (e) {
+          statusArea.innerHTML = `<span class="error">${e.message}</span>`;
+        }
+      }
+
+      async function pollStatus(taskId) {
+        const statusArea = document.getElementById("statusArea");
+        const preview = document.getElementById("preview");
+
+        const interval = setInterval(async () => {
+          const res = await fetch(`/api/status/${taskId}`);
+          const data = await res.json();
+
+          if (data.state === "SUCCESS") {
+            clearInterval(interval);
+            statusArea.innerHTML = '<span class="success">Terminé !</span>';
+            preview.src = data.url;
+            preview.style.display = "block";
+          } else if (data.state === "FAILURE") {
+            clearInterval(interval);
+            statusArea.innerHTML = `<span class="error">Erreur: ${data.error}</span>`;
+          }
+        }, 1000);
+      }
+    </script>
   </body>
 </html>

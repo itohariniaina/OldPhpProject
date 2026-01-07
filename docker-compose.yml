@@ -1,11 +1,71 @@
+version: "3.8"
+
 services:
+  # 1. API Web (Flask)
   web:
     build: .
     ports:
-      # Format : "PORT_HOTE : PORT_CONTENEUR"
-      # On change le port gauche (votre machine) en 5001
       - "5001:5000"
     volumes:
-      - ./app:/app/app
+      - .:/app # Montage pour dev (modifs en direct)
+      - uploads_data:/tmp/uploads
     environment:
-      - FLASK_DEBUG=1
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - AWS_ENDPOINT_URL=http://minio:9000
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin
+      - S3_BUCKET_NAME=images-upload
+    depends_on:
+      - redis
+      - minio
+
+  # 2. Worker (Celery) - Le muscle
+  worker:
+    build: .
+    command: celery -A app.worker.celery worker --loglevel=info
+    volumes:
+      - .:/app
+      - uploads_data:/tmp/uploads
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - AWS_ENDPOINT_URL=http://minio:9000
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin
+      - S3_BUCKET_NAME=images-upload
+    depends_on:
+      - redis
+      - minio
+
+  # 3. File d'attente
+  redis:
+    image: "redis:alpine"
+
+  # 4. Stockage S3 Local
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+
+  # 5. Utilitaire pour créer le bucket automatiquement
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc mb myminio/images-upload;
+      /usr/bin/mc anonymous set public myminio/images-upload;
+      exit 0;
+      "
+volumes:
+  minio_data:
+  uploads_data:

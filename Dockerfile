@@ -1,26 +1,20 @@
-# Utilisation d'une image Python légère
 FROM python:3.9-slim
 
-# Installation des dépendances système nécessaires pour le traitement d'image
-RUN apt-get update && apt-get install -y \
-    libgomp1 \
-    && rm -rf /var/lib/apt/lists/*
+# Installation des dépendances système pour le traitement d'image (OpenMP)
+RUN apt-get update && apt-get install -y libgomp1 && rm -rf /var/lib/apt/lists/*
 
-# Dossier de travail
 WORKDIR /app
 
-# Copie des dépendances et installation
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copie du code source
+# Copie du code
 COPY app/ ./app/
 
-# Création des dossiers pour uploads/outputs
-RUN mkdir -p /app/app/static/uploads /app/app/static/output
+# Création dossier temporaire pour uploads
+RUN mkdir -p /tmp/uploads
 
-# Exposition du port
-EXPOSE 5000
+# Variable d'environnement pour que Python trouve le module 'app'
+ENV PYTHONPATH=/app
 
-# Commande de lancement
 CMD ["python", "-m", "app.main"]
