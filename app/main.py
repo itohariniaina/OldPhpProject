@@ -3,12 +3,25 @@ from app.worker import process_image_task
 import os
 import uuid
 import redis  # <--- Il faut importer la lib redis
+import imghdr
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
 
 # Création du dossier temporaire
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+
+# --- 🔒 SÉCURITÉ 1 : PROTECTION IP (Conditionnelle) ---
+# Si la variable 'AZURE_DEPLOYMENT' existe (on la mettra sur Azure), on active le fix.
+# Sinon (en local), on ne fait rien pour ne pas casser l'app.
+if os.getenv('AZURE_DEPLOYMENT') == 'True':
+    print("🔒 Mode Production (Azure) : ProxyFix activé")
+    # Azure utilise 1 proxy (Load Balancer) devant l'app
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+else:
+    print("💻 Mode Local : ProxyFix désactivé")
 
 # --- CONNEXION À REDIS ---
 # On se connecte au service "redis" défini dans docker-compose
@@ -49,6 +62,12 @@ def optimize():
         return jsonify({"error": "Aucune image envoyée"}), 400
         
     file = request.files['image']
+    header = file.read(512)
+    file.seek(0) # IMPORTANT : On rembobine après lecture !
+    
+    format_detecte = imghdr.what(None, header)
+    if format_detecte not in ['jpeg', 'png', 'gif']:
+        return jsonify({"error": "Format invalide. Seuls JPG et PNG sont acceptés."}), 400
     n_colors = int(request.form.get('colors', 8))
     
     # 3. Sauvegarde locale temporaire
@@ -89,4 +108,8 @@ def status(task_id):
     return jsonify({"state": task.state}), 200
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # --- 🔒 SÉCURITÉ 3 : DÉSACTIVATION DEBUG ---
+    # On ne met JAMAIS debug=True en dur.
+    # On utilise la variable d'environnement FLASK_DEBUG gérée par Docker.
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)

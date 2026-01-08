@@ -1,174 +1,189 @@
-# 🎨 Système de Quantification des Couleurs (Python Edition)
+# 🎨 Quantize.Studio - Intelligent Image Optimization SaaS
 
-> **Modernisation d'un projet legacy PHP vers Python** | **Traitement d'images vectorisé** | **Architecture Dockerisée**
+![Python](https://img.shields.io/badge/Python-3.9-blue?style=flat&logo=python)
+![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=flat&logo=docker)
+![Azure](https://img.shields.io/badge/Deployment-Azure-0078D4?style=flat&logo=microsoft-azure)
+![Scientific](https://img.shields.io/badge/Metric-CIEDE2000-green)
 
-[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
-[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-[![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)](https://numpy.org/)
-[![Scikit-Learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+**Quantize.Studio** est une plateforme SaaS permettant aux professionnels de l'impression (Print-on-Demand) et du e-commerce de réduire les coûts d'encre en optimisant intelligemment les couleurs des images, sans perte visuelle perceptible.
 
-👉 **[Accéder au projet GitLab](https://forge.univ-lyon1.fr/p2202482/projetphp)**
-
----
-
-## 🎯 À propos du projet
-
-Ce projet est une **refonte complète** d'un ancien système de quantification de couleurs PHP. L'objectif était de migrer d'une architecture impérative lente vers une architecture **Python vectorisée** et conteneurisée.
-
-L'application permet de réduire le nombre de couleurs d'une image (Quantification) tout en minimisant la perte de qualité visuelle perceptuelle (Delta-E).
-
-### ✨ Améliorations de la version Python
-
-🚀 **Performance Extrême**
-
-- **Avant (PHP)** : Boucles `for` imbriquées sur les pixels (O(n\*k)).
-- **Après (Python)** : Opérations matricielles via **NumPy** et implémentations C-optimized via **Scikit-learn**.
-
-🔬 **Méthodes de Quantification**
-
-- **Méthode Naïve** : Algorithme _Fast Octree_ (via PIL/Pillow).
-- **Algorithme K-means** : Clustering vectorisé avec `MiniBatchKMeans` (Scikit-learn).
-- **Méthode Pro** : Algorithme _Median Cut_ (Standard industriel).
-
-📊 **Métriques Scientifiques**
-
-- Calcul du **Delta-E CIEDE2000** via `skimage` (beaucoup plus précis et rapide que l'implémentation manuelle).
+Ce projet est une refonte complète "Cloud-Native" d'une application legacy, passant d'un script PHP séquentiel à une architecture micro-services asynchrone en Python.
 
 ---
 
-## 🛠️ Stack Technique
+## 💎 Pourquoi ce projet ? (Value Proposition)
 
-### Backend & Science des Données
+L'impression textile (DTG - Direct to Garment) coûte cher. Imprimer une image de 16 millions de couleurs est inutilement coûteux si l'œil humain n'en perçoit qu'une fraction.
 
-![Python](https://img.shields.io/badge/Python_3.9+-3776AB?style=flat-square&logo=python&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-000000?style=flat-square&logo=flask&logoColor=white)
-![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white)
-![Pillow](https://img.shields.io/badge/Pillow-Image_Processing-blue?style=flat-square)
+**Notre solution :**
 
-### Infrastructure & DevOps
-
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
-![Docker Compose](https://img.shields.io/badge/Docker_Compose-2496ED?style=flat-square&logo=docker&logoColor=white)
-
-### Frontend
-
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
-![Jinja2](https://img.shields.io/badge/Jinja2-Templates-B41717?style=flat-square)
+1.  **Réduction Algorithmique :** Utilisation de K-Means dans l'espace colorimétrique **CIELAB** pour ne garder que les couleurs dominantes "perceptuelles".
+2.  **Garantie Scientifique :** Calcul automatique du **Delta-E (CIEDE2000)** pour valider mathématiquement la fidélité de l'image.
+3.  **Visualisation Produit :** Rendu 3D instantané sur un T-shirt via WebGL (`<model-viewer>`).
 
 ---
 
-## 🚀 Installation & Démarrage
+## ⚙️ Architecture Technique
 
-Le projet est entièrement conteneurisé. Vous n'avez besoin que de Docker.
+L'application repose sur une architecture **Micro-services** conteneurisée :
 
-### Pré-requis
+- **API Gateway (Flask)** : Gère les requêtes HTTP, le Rate Limiting (Freemium) et l'upload.
+- **Worker Asynchrone (Celery)** : Exécute les calculs lourds (K-Means, Delta-E) en arrière-plan sans bloquer l'interface.
+- **Message Broker (Redis)** : Gère la file d'attente des tâches et les quotas utilisateurs.
+- **Storage (S3 Compatible)** : Stockage sécurisé des images traitées (MinIO en local, Scaleway en Prod).
+- **Infrastructure** : Orchestration via **Docker Compose** en local et **Azure App Service** en production.
 
-- Docker Desktop & Docker Compose
+### Stack Technologique
 
-### Lancement rapide
+- **Backend :** Python 3.9, Flask, Celery.
+- **Data Science :** NumPy, Scikit-learn (MiniBatchKMeans), Scikit-image (Delta-E).
+- **Frontend :** HTML5, JavaScript (Polling), Google Model-Viewer (3D).
+- **DevOps :** Docker, Docker Compose, Azure CLI, GitHub Actions.
+
+---
+
+## 🔬 L'Approche Scientifique (K-Means & CIELAB)
+
+Contrairement aux outils classiques qui réduisent les couleurs dans l'espace RGB (rouge, vert, bleu), notre algorithme effectue une conversion préalable vers l'espace **L\*a\*b\***.
+
+1.  **Conversion RGB -> LAB :** L'espace LAB est conçu pour être "perceptuellement uniforme".
+2.  **Clustering :** L'algorithme K-Means regroupe les pixels selon leur distance visuelle réelle et non leur code informatique.
+3.  **Validation :** Chaque image générée reçoit un score de qualité (Delta-E).
+    - _Delta-E < 2.3_ : Différence imperceptible à l'œil nu (Validé pour impression).
+
+---
+
+## 🚀 Installation & Développement Local
+
+### Prérequis
+
+- Docker & Docker Compose
+- Git
+
+### 1. Cloner le projet
 
 ```bash
-# 1. Cloner le projet
-git clone [https://forge.univ-lyon1.fr/p2202482/projetphp.git](https://forge.univ-lyon1.fr/p2202482/projetphp.git)
-cd projetphp
+git clone [https://github.com/votre-username/quantize-studio.git](https://github.com/votre-username/quantize-studio.git)
+cd quantize-studio
+```
 
-# 2. Lancer l'environnement (Backend Flask)
+### 2. Configuration (.env)
+
+Créez un fichier `.env` à la racine (ne pas commiter ce fichier) :
+
+```ini
+# Configuration Locale (Docker)
+FLASK_DEBUG=1
+CELERY_BROKER_URL=redis://redis:6379/0
+CELERY_RESULT_BACKEND=redis://redis:6379/1
+
+# Stockage MinIO (Local S3)
+AWS_ENDPOINT_URL=http://minio:9000
+AWS_ACCESS_KEY_ID=minioadmin
+AWS_SECRET_ACCESS_KEY=minioadmin
+S3_BUCKET_NAME=images-upload
+
+```
+
+### 3. Lancer l'application
+
+```bash
 docker-compose up --build
+
 ```
 
-L'application sera accessible sur : **http://localhost:5001**
+- **Application Web :** `http://localhost:5001`
+- **Console MinIO :** `http://localhost:9001` (User/Pass: `minioadmin`)
 
 ---
 
-## 💡 Innovation Technique : PHP vs Python
+## ☁️ Déploiement Cloud (Microsoft Azure)
 
-### 1\. K-Means Clustering
+Ce projet déploie une architecture **Hybrid Cloud** pour optimiser les coûts : le calcul est effectué sur **Azure**, le stockage sur **Scaleway** (S3).
 
-Le passage à Python permet d'utiliser `MiniBatchKMeans` qui est optimisé en C et utilise le parallélisme CPU, contrairement à l'implémentation PHP pure.
+### 1. Création de l'infrastructure Azure
 
-```python
-# Python (Vectorisé - Scikit Learn)
-# Traite l'image entière comme une matrice (h*w, 3) en une fraction de seconde
-kmeans = MiniBatchKMeans(n_clusters=n_colors, batch_size=2048)
-labels = kmeans.fit_predict(pixels)
-palette = kmeans.cluster_centers_.astype('uint8')
+```bash
+# Créer le groupe de ressources
+az group create --name QuantizeRG --location francecentral
+
+# Créer le registre Docker (ACR)
+az acr create --resource-group QuantizeRG --name <VOTRE_REGISTRE> --sku Basic --admin-enabled true
+
 ```
 
-### 2\. Calcul Delta-E (Qualité Perceptuelle)
+### 2. Build & Push de l'image
 
-L'utilisation de `scikit-image` permet de calculer la différence perceptuelle sur l'ensemble de l'image sans boucles explicites.
+```bash
+az acr login --name <VOTRE_REGISTRE>
+docker build -t quantize-img .
+docker tag quantize-img <VOTRE_REGISTRE>.azurecr.io/quantize-img:v1
+docker push <VOTRE_REGISTRE>.azurecr.io/quantize-img:v1
 
-```python
-# Conversion et calcul vectorisé RGB -> LAB -> DeltaE
-lab1 = color.rgb2lab(img1)
-lab2 = color.rgb2lab(img2)
-delta_e = color.deltaE_ciede2000(lab1, lab2) # Résultat immédiat
 ```
 
-### 3\. Architecture Docker
+### 3. Configuration de l'Orchestration
 
-Fini les configurations WAMP/XAMPP complexes. Le `Dockerfile` gère l'environnement d'exécution.
+Créez un fichier `docker-compose-azure.yml` :
 
-```dockerfile
-FROM python:3.9-slim
-RUN apt-get install -y libgomp1 # Support OpenMP pour Scikit-learn
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-CMD ["python", "-m", "app.main"]
+```yaml
+version: "3.8"
+services:
+  web:
+    image: <VOTRE_REGISTRE>.azurecr.io/quantize-img:v1
+    ports: ["80:5000"]
+    environment:
+      - WEBSITES_PORT=5000
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - AWS_ENDPOINT_URL=[https://s3.fr-par.scw.cloud](https://s3.fr-par.scw.cloud)
+      - AWS_ACCESS_KEY_ID=VOTRE_ACCESS_KEY
+      - AWS_SECRET_ACCESS_KEY=VOTRE_SECRET_KEY
+      - S3_BUCKET_NAME=nom-du-bucket-prod
+  worker:
+    image: <VOTRE_REGISTRE>.azurecr.io/quantize-img:v1
+    command: celery -A app.worker.celery worker --loglevel=info
+    environment:
+      # Mêmes variables que web
+  redis:
+    image: redis:alpine
+```
+
+### 4. Déploiement sur App Service
+
+```bash
+# Créer le plan (B1 est inclus dans Azure for Students)
+az appservice plan create --name QuantizePlan --resource-group QuantizeRG --sku B1 --is-linux
+
+# Créer la Web App Multi-conteneurs
+az webapp create --resource-group QuantizeRG --plan QuantizePlan --name <NOM_APP> --multicontainer-config-type compose --multicontainer-config-file docker-compose-azure.yml
+
+# Lier au registre (Credentials)
+az webapp config container set --name <NOM_APP> --resource-group QuantizeRG \
+--docker-custom-image-name <VOTRE_REGISTRE>.azurecr.io/quantize-img:v1 \
+--docker-registry-server-url https://<VOTRE_REGISTRE>.azurecr.io \
+--docker-registry-server-user <VOTRE_REGISTRE> \
+--docker-registry-server-password <PASSWORD>
+
 ```
 
 ---
 
-## 📈 Nouvelle Architecture du Projet
+## Roadmap & Améliorations
 
-```
-🎨 Projet Python/Flask
-├── 🐳 docker-compose.yml    # Orchestration
-├── 🐳 Dockerfile            # Image Python optimisée
-├── 🐍 app/
-│   ├── __init__.py
-│   ├── main.py              # Contrôleur Flask (Routes)
-│   ├── logic.py             # Logique Métier (NumPy, Sklearn, PIL)
-│   ├── static/
-│   │   ├── css/
-│   │   ├── uploads/         # Stockage temporaire (Volume Docker)
-│   │   └── output/          # Résultats générés
-│   └── templates/           # Vues Jinja2 (HTML)
-│       ├── index.html
-│       └── results.html
-└── 📄 requirements.txt      # Dépendances Python
-```
+- [x] Migration PHP vers Python/NumPy
+- [x] Architecture Docker Asynchrone
+- [x] Support S3 / MinIO
+- [ ] Visualisation 3D
+- [ ] Créations de comptes / Types de service (crédits)
+      => Ajout d'une base de données
+- [ ] Déploiement sur Microsoft Azure
+- [ ] Intégration Stripe pour les paiements
+- [ ] API Publique avec Clé développeur
 
 ---
 
-## 🔬 Résultats & Performance
+## 👤 Auteur
 
-La migration a permis des gains de performances significatifs :
-
-| Métrique                     | Version PHP Legacy    | Version Python (Actuelle) | Gain    |
-| ---------------------------- | --------------------- | ------------------------- | ------- |
-| **Temps K-Means (Image 4K)** | \~15-30 secondes      | **\< 2 secondes**         | **x15** |
-| **Précision Delta-E**        | Approximation         | **CIEDE2000 Exact**       | ++      |
-| **Déploiement**              | Complexe (Apache/PHP) | **1 commande Docker**     | ++      |
-
----
-
-## 📧 Contact
-
-**Développé par Hariniaina Itokiana**
-_Projet de modernisation technique - BUT Informatique Lyon 1_
-
-[](mailto:rak.hariniainaitokiana@gmail.com)
-[](https://www.linkedin.com/in/hariniaina-itokiana-rak/)
-
-**📍 Basé à Lyon — Ouvert à la mobilité**
-
-```
-
-```
-
-```
-
-```
+Projet développé par **ito.hariniaina** .
+Contact : [rak.hariniainaitokiana@gmail.com](mailto:rak.hariniainaitokiana@gmail.com)

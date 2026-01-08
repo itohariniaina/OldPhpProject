@@ -4,6 +4,11 @@ from skimage import color
 from PIL import Image
 import os
 
+# Protection contre les bombes de décompression
+# Limite à environ 80 Megapixels (ex: 9000x9000px)
+# Si l'image est plus grande, Pillow lèvera une exception DecompressionBombError
+Image.MAX_IMAGE_PIXELS = 80_000_000
+
 def kmeans_quantization(image_path, n_colors):
     """
     Réduit le nombre de couleurs d'une image en utilisant K-Means.

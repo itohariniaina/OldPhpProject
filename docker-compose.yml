@@ -10,6 +10,7 @@ services:
       - .:/app # Montage pour dev (modifs en direct)
       - uploads_data:/tmp/uploads
     environment:
+      - FLASK_DEBUG=1
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - AWS_ENDPOINT_URL=http://minio:9000
