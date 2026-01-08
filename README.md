@@ -1,4 +1,4 @@
-# 🎨 Quantize.Studio - Intelligent Image Optimization SaaS
+# Quantize.Studio - Intelligent Image Optimization SaaS
 
 ![Python](https://img.shields.io/badge/Python-3.9-blue?style=flat&logo=python)
 ![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=flat&logo=docker)
@@ -11,7 +11,7 @@ Ce projet est une refonte complète "Cloud-Native" d'une application legacy, pas
 
 ---
 
-## 💎 Pourquoi ce projet ? (Value Proposition)
+## Pourquoi ce projet ? (Value Proposition)
 
 L'impression textile (DTG - Direct to Garment) coûte cher. Imprimer une image de 16 millions de couleurs est inutilement coûteux si l'œil humain n'en perçoit qu'une fraction.
 
@@ -23,7 +23,7 @@ L'impression textile (DTG - Direct to Garment) coûte cher. Imprimer une image d
 
 ---
 
-## ⚙️ Architecture Technique
+## Architecture Technique
 
 L'application repose sur une architecture **Micro-services** conteneurisée :
 
@@ -42,7 +42,7 @@ L'application repose sur une architecture **Micro-services** conteneurisée :
 
 ---
 
-## 🔬 L'Approche Scientifique (K-Means & CIELAB)
+## L'Approche Scientifique (K-Means & CIELAB)
 
 Contrairement aux outils classiques qui réduisent les couleurs dans l'espace RGB (rouge, vert, bleu), notre algorithme effectue une conversion préalable vers l'espace **L\*a\*b\***.
 
@@ -53,7 +53,7 @@ Contrairement aux outils classiques qui réduisent les couleurs dans l'espace RG
 
 ---
 
-## 🚀 Installation & Développement Local
+## Installation & Développement Local
 
 ### Prérequis
 
@@ -97,75 +97,16 @@ docker-compose up --build
 
 ---
 
-## ☁️ Déploiement Cloud (Microsoft Azure)
+## ☁️ Stratégie de Déploiement Cloud
 
-Ce projet déploie une architecture **Hybrid Cloud** pour optimiser les coûts : le calcul est effectué sur **Azure**, le stockage sur **Scaleway** (S3).
+Le projet est conçu pour être déployé sur **Microsoft Azure** avec une architecture **Hybrid Cloud** optimisant les coûts :
 
-### 1. Création de l'infrastructure Azure
+- **Calcul :** Azure App Service (Plan B1 - Compatible Azure for Students)
+- **Stockage :** Scaleway Object Storage (S3 Compatible)
+- **Conteneurisation :** Azure Container Registry (ACR) pour héberger les images Docker
+- **Orchestration :** Docker Compose multi-conteneurs (Web + Worker + Redis)
 
-```bash
-# Créer le groupe de ressources
-az group create --name QuantizeRG --location francecentral
-
-# Créer le registre Docker (ACR)
-az acr create --resource-group QuantizeRG --name <VOTRE_REGISTRE> --sku Basic --admin-enabled true
-
-```
-
-### 2. Build & Push de l'image
-
-```bash
-az acr login --name <VOTRE_REGISTRE>
-docker build -t quantize-img .
-docker tag quantize-img <VOTRE_REGISTRE>.azurecr.io/quantize-img:v1
-docker push <VOTRE_REGISTRE>.azurecr.io/quantize-img:v1
-
-```
-
-### 3. Configuration de l'Orchestration
-
-Créez un fichier `docker-compose-azure.yml` :
-
-```yaml
-version: "3.8"
-services:
-  web:
-    image: <VOTRE_REGISTRE>.azurecr.io/quantize-img:v1
-    ports: ["80:5000"]
-    environment:
-      - WEBSITES_PORT=5000
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/1
-      - AWS_ENDPOINT_URL=[https://s3.fr-par.scw.cloud](https://s3.fr-par.scw.cloud)
-      - AWS_ACCESS_KEY_ID=VOTRE_ACCESS_KEY
-      - AWS_SECRET_ACCESS_KEY=VOTRE_SECRET_KEY
-      - S3_BUCKET_NAME=nom-du-bucket-prod
-  worker:
-    image: <VOTRE_REGISTRE>.azurecr.io/quantize-img:v1
-    command: celery -A app.worker.celery worker --loglevel=info
-    environment:
-      # Mêmes variables que web
-  redis:
-    image: redis:alpine
-```
-
-### 4. Déploiement sur App Service
-
-```bash
-# Créer le plan (B1 est inclus dans Azure for Students)
-az appservice plan create --name QuantizePlan --resource-group QuantizeRG --sku B1 --is-linux
-
-# Créer la Web App Multi-conteneurs
-az webapp create --resource-group QuantizeRG --plan QuantizePlan --name <NOM_APP> --multicontainer-config-type compose --multicontainer-config-file docker-compose-azure.yml
-
-# Lier au registre (Credentials)
-az webapp config container set --name <NOM_APP> --resource-group QuantizeRG \
---docker-custom-image-name <VOTRE_REGISTRE>.azurecr.io/quantize-img:v1 \
---docker-registry-server-url https://<VOTRE_REGISTRE>.azurecr.io \
---docker-registry-server-user <VOTRE_REGISTRE> \
---docker-registry-server-password <PASSWORD>
-
-```
+Cette approche permet de bénéficier de la puissance de calcul Azure tout en réduisant les coûts de stockage grâce à Scaleway, offrant ainsi une solution économique pour les startups et les étudiants.
 
 ---
 
