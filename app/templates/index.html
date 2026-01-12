@@ -3,65 +3,208 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OptimizeSaaS - Demo</title>
+    <title>Quantize.Studio - Démo DevOps</title>
     <style>
       body {
-        font-family: sans-serif;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         max-width: 800px;
-        margin: 40px auto;
-        padding: 20px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        background-color: #f9f9f9;
+        color: #333;
       }
-      .box {
-        border: 2px dashed #ccc;
-        padding: 20px;
+      h1 {
         text-align: center;
-        margin-bottom: 20px;
+        color: #2c3e50;
       }
-      #preview {
-        max-width: 100%;
+      p.subtitle {
+        text-align: center;
+        color: #7f8c8d;
+        margin-bottom: 30px;
+      }
+
+      .box {
+        background: white;
+        border: 2px dashed #bdc3c7;
+        padding: 40px;
+        text-align: center;
+        border-radius: 10px;
+        transition: border-color 0.3s;
+      }
+      .box:hover {
+        border-color: #3498db;
+      }
+
+      button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 15px;
+      }
+      button:hover {
+        background-color: #2980b9;
+      }
+
+      /* --- MOCKUP T-SHIRT --- */
+      .mockup-section {
+        margin: 40px auto;
+        text-align: center;
+      }
+
+      .tshirt-mockup {
+        position: relative;
+        width: 400px;
+        margin: 0 auto;
+        border-radius: 20px;
+        overflow: hidden;
+      }
+
+      .tshirt-image {
+        width: 100%;
+        display: block;
+      }
+
+      /* Zone de print sur le t-shirt */
+      .print-area {
+        position: absolute;
+        top: 34%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 28%;
+        height: 28%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .design-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        /* Effet d'incrustation tissu */
+        mix-blend-mode: multiply;
+        opacity: 0.9;
+        filter: contrast(1.05) saturate(0.95);
+      }
+
+      /* Placeholder quand pas d'image */
+      .placeholder {
+        color: rgba(0, 0, 0, 0.2);
+        font-size: 11px;
+        text-align: center;
+        background: rgba(0, 0, 0, 0.03);
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px dashed rgba(0, 0, 0, 0.1);
+      }
+
+      /* --- RESULTATS TECHNIQUES --- */
+      #statusArea {
+        text-align: center;
         margin-top: 20px;
-        display: none;
-      }
-      .loading {
-        color: #007bff;
-        display: none;
-      }
-      .success {
-        color: #28a745;
         font-weight: bold;
       }
+
+      .metrics-container {
+        text-align: center;
+        margin-top: 20px;
+        display: none;
+        background: #eef2f3;
+        padding: 15px;
+        border-radius: 8px;
+      }
+
+      .loading {
+        color: #e67e22;
+      }
+      .success {
+        color: #27ae60;
+      }
       .error {
-        color: #dc3545;
+        color: #c0392b;
+      }
+
+      .raw-preview {
+        max-width: 100px;
+        border: 1px solid #ddd;
+        margin-top: 10px;
+        border-radius: 4px;
       }
     </style>
   </head>
   <body>
-    <h1>🎨 OptimizeSaaS (Demo Locale)</h1>
-    <p>Réduisez les couleurs de vos images grâce à l'IA.</p>
+    <h1>Quantize.Studio</h1>
+    <p class="subtitle">
+      Architecture Micro-services & Optimisation ML sur Azure
+    </p>
 
     <div class="box">
       <input type="file" id="imageInput" accept="image/*" />
       <br /><br />
-      <label
-        >Couleurs : <input type="number" id="colors" value="8" min="2" max="16"
-      /></label>
-      <br /><br />
-      <button onclick="uploadImage()">Optimiser l'image</button>
+      <label>
+        Nombre de couleurs (K-Means) :
+        <input
+          type="number"
+          id="colors"
+          value="8"
+          min="2"
+          max="16"
+          style="width: 50px; padding: 5px"
+        />
+      </label>
+      <br />
+      <button onclick="uploadImage()">Lancer le Pipeline</button>
     </div>
 
     <div id="statusArea"></div>
-    <div id="preview-container">
-      <span class="tag-result">Image Optimisée pour impression</span>
-      <img id="preview" src="" alt="Résultat" />
 
-      <p style="margin-top: 10px; font-weight: bold">
-        Précision Delta-E :
-        <span id="deltaValue" style="color: #007bff">...</span>
+    <!-- MOCKUP T-SHIRT -->
+    <div class="mockup-section">
+      <div class="tshirt-mockup">
+        <!-- Image t-shirt blanc classique -->
+        <img
+          src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80"
+          alt="T-Shirt Mockup"
+          class="tshirt-image"
+          crossorigin="anonymous"
+        />
+
+        <!-- Zone d'impression -->
+        <div class="print-area">
+          <img
+            id="mockup-design"
+            class="design-image"
+            src=""
+            alt="Design"
+            style="display: none"
+          />
+          <div id="placeholder" class="placeholder">
+            Votre design<br />apparaîtra ici
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="metrics" class="metrics-container">
+      <h3>Rapport d'Optimisation</h3>
+      <p>
+        <strong>Algorithme :</strong> MiniBatchKMeans (Scikit-Learn)<br />
+        <strong>Précision (Delta-E) :</strong>
+        <span id="deltaValue" style="color: #3498db">...</span><br />
+        <span style="font-size: 0.9em; color: #7f8c8d"
+          >(Score < 2.3 considéré comme imperceptible à l'œil nu)</span
+        >
       </p>
-      <p style="font-size: 0.8em; color: #666">
-        (Plus proche de 0 = Meilleure qualité)
+      <p style="color: green; font-weight: bold">
+        ✔ Économie d'encre estimée : ~40%
       </p>
-      <p style="font-size: 0.9em; color: green">Coût d'encre réduit de ~40%</p>
+
+      <p>Fichier brut généré :</p>
+      <img id="raw-preview" src="" class="raw-preview" alt="Raw Output" />
     </div>
 
     <script>
@@ -69,20 +212,23 @@
         const fileInput = document.getElementById("imageInput");
         const colors = document.getElementById("colors").value;
         const statusArea = document.getElementById("statusArea");
-        const preview = document.getElementById("preview");
 
-        if (!fileInput.files[0]) return alert("Sélectionnez une image !");
+        document.getElementById("metrics").style.display = "none";
+        document.getElementById("mockup-design").style.display = "none";
+        document.getElementById("mockup-design").src = "";
+        document.getElementById("placeholder").style.display = "block";
+
+        if (!fileInput.files[0])
+          return alert("Veuillez sélectionner une image.");
 
         const formData = new FormData();
         formData.append("image", fileInput.files[0]);
         formData.append("colors", colors);
 
         statusArea.innerHTML =
-          '<span class="loading">Envoi et traitement en cours...</span>';
-        preview.style.display = "none";
+          '<span class="loading">⏳ Upload vers Azure & Mise en file d\'attente (Redis)...</span>';
 
         try {
-          // 1. Envoi au serveur
           const response = await fetch("/api/optimize", {
             method: "POST",
             body: formData,
@@ -91,34 +237,50 @@
 
           if (!response.ok) throw new Error(data.error || "Erreur serveur");
 
-          statusArea.innerHTML = `Traitement ID: ${data.task_id} (Quota: ${data.quota_used})...`;
+          statusArea.innerHTML = `⚙️ Tâche ID: ${data.task_id} démarrée par le Worker...`;
 
-          // 2. Polling (Vérifier le statut toutes les secondes)
           pollStatus(data.task_id);
         } catch (e) {
-          statusArea.innerHTML = `<span class="error">${e.message}</span>`;
+          statusArea.innerHTML = `<span class="error">❌ Erreur: ${e.message}</span>`;
         }
       }
 
       async function pollStatus(taskId) {
         const statusArea = document.getElementById("statusArea");
-        const preview = document.getElementById("preview");
+        const mockupImg = document.getElementById("mockup-design");
+        const rawPreview = document.getElementById("raw-preview");
+        const placeholder = document.getElementById("placeholder");
 
         const interval = setInterval(async () => {
-          const res = await fetch(`/api/status/${taskId}`);
-          const data = await res.json();
+          try {
+            const res = await fetch(`/api/status/${taskId}`);
+            const data = await res.json();
 
-          if (data.state === "SUCCESS") {
-            clearInterval(interval);
-            statusArea.innerHTML = '<span class="success">Terminé !</span>';
-            preview.src = data.url;
-            preview.style.display = "block";
-            document.getElementById("deltaValue").innerText = data.delta_e;
-            previewContainer.style.display = "block";
-            applyTextureToModel(data.url);
-          } else if (data.state === "FAILURE") {
-            clearInterval(interval);
-            statusArea.innerHTML = `<span class="error">Erreur: ${data.error}</span>`;
+            if (data.state === "SUCCESS") {
+              clearInterval(interval);
+              statusArea.innerHTML =
+                '<span class="success">✅ Traitement terminé avec succès !</span>';
+
+              const resultUrl = data.url + "?t=" + Date.now();
+
+              mockupImg.onload = function () {
+                placeholder.style.display = "none";
+                mockupImg.style.display = "block";
+              };
+
+              mockupImg.src = resultUrl;
+              rawPreview.src = resultUrl;
+
+              document.getElementById("deltaValue").innerText =
+                data.delta_e || "N/A";
+
+              document.getElementById("metrics").style.display = "block";
+            } else if (data.state === "FAILURE") {
+              clearInterval(interval);
+              statusArea.innerHTML = `<span class="error">❌ Erreur du Worker: ${data.error}</span>`;
+            }
+          } catch (err) {
+            console.error("Erreur de polling", err);
           }
         }, 1000);
       }
